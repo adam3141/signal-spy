@@ -3,23 +3,29 @@
 #include <imgui.h>
 #include <string>
 
-namespace spy::ui {
+namespace spy::ui
+{
 
-struct DockingLayoutManager::Impl {
+struct DockingLayoutManager::Impl
+{
     std::string _title{"Dockspace Manager"};
     bool _visible{true};
 };
 
 DockingLayoutManager::DockingLayoutManager()
-    : _impl(std::make_unique<Impl>()) {}
+    : _impl(std::make_unique<Impl>())
+{
+}
 
 DockingLayoutManager::~DockingLayoutManager() = default;
 
 DockingLayoutManager::DockingLayoutManager(DockingLayoutManager&&) noexcept = default;
 DockingLayoutManager& DockingLayoutManager::operator=(DockingLayoutManager&&) noexcept = default;
 
-void DockingLayoutManager::Render() {
-    if (!_impl->_visible) {
+void DockingLayoutManager::Render()
+{
+    if (!_impl->_visible)
+    {
         return;
     }
 
@@ -34,14 +40,16 @@ void DockingLayoutManager::Render() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    window_flags |=
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
     ImGui::Begin("MainDockSpace", nullptr, window_flags);
     ImGui::PopStyleVar(3);
 
     ImGuiIO& io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+    {
         ImGuiID dockspace_id = ImGui::GetID("SignalSpyDockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
     }
@@ -49,17 +57,19 @@ void DockingLayoutManager::Render() {
     ImGui::End();
 }
 
-std::string_view DockingLayoutManager::get_Title() const noexcept {
+std::string_view DockingLayoutManager::get_Title() const noexcept
+{
     return _impl->_title;
 }
 
-bool DockingLayoutManager::is_Visible() const noexcept {
+bool DockingLayoutManager::is_Visible() const noexcept
+{
     return _impl->_visible;
 }
 
-void DockingLayoutManager::set_Visible(bool visible) noexcept {
+void DockingLayoutManager::set_Visible(bool visible) noexcept
+{
     _impl->_visible = visible;
 }
-
 
 } // namespace spy::ui

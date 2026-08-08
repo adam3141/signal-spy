@@ -7,40 +7,50 @@
 #include <memory>
 #include <string>
 
-namespace spy::ui::testing {
+namespace spy::ui::testing
+{
 
-class MockTestWidget : public IWidget {
-public:
+class MockTestWidget : public IWidget
+{
+  public:
     explicit MockTestWidget(std::string name)
-        : _title(std::move(name)) {}
+        : _title(std::move(name))
+    {
+    }
 
-    void Render() override {
+    void Render() override
+    {
         _render_count++;
     }
 
-    [[nodiscard]] std::string_view get_Title() const noexcept override {
+    [[nodiscard]] std::string_view get_Title() const noexcept override
+    {
         return _title;
     }
 
-    [[nodiscard]] bool is_Visible() const noexcept override {
+    [[nodiscard]] bool is_Visible() const noexcept override
+    {
         return _visible;
     }
 
-    void set_Visible(bool visible) noexcept override {
+    void set_Visible(bool visible) noexcept override
+    {
         _visible = visible;
     }
 
-    [[nodiscard]] size_t get_Render_Count() const noexcept {
+    [[nodiscard]] size_t get_Render_Count() const noexcept
+    {
         return _render_count;
     }
 
-private:
+  private:
     std::string _title;
     bool _visible{true};
     size_t _render_count{0};
 };
 
-TEST(UIRendererTest, MockWidgetLifecycle) {
+TEST(UIRendererTest, MockWidgetLifecycle)
+{
     auto widget = std::make_shared<MockTestWidget>("Test Panel");
     EXPECT_EQ(widget->get_Title(), "Test Panel");
     EXPECT_TRUE(widget->is_Visible());
@@ -53,7 +63,8 @@ TEST(UIRendererTest, MockWidgetLifecycle) {
     EXPECT_FALSE(widget->is_Visible());
 }
 
-TEST(UIRendererTest, DockingLayoutManagerLifecycle) {
+TEST(UIRendererTest, DockingLayoutManagerLifecycle)
+{
     DockingLayoutManager manager;
     EXPECT_EQ(manager.get_Title(), "Dockspace Manager");
     EXPECT_TRUE(manager.is_Visible());
@@ -62,7 +73,8 @@ TEST(UIRendererTest, DockingLayoutManagerLifecycle) {
     EXPECT_FALSE(manager.is_Visible());
 }
 
-TEST(UIRendererTest, HeadlessRendererInitializationAndLoop) {
+TEST(UIRendererTest, HeadlessRendererInitializationAndLoop)
+{
     auto renderer = CreateUIRenderer();
     ASSERT_NE(renderer, nullptr);
 
@@ -86,7 +98,5 @@ TEST(UIRendererTest, HeadlessRendererInitializationAndLoop) {
 
     renderer->Shutdown();
 }
-
-
 
 } // namespace spy::ui::testing

@@ -2,15 +2,17 @@
 
 #include <string_view>
 
-namespace spy::ui {
+namespace spy::ui
+{
 
 /**
  * @brief Abstract interface for all UI widgets and dockable panels.
- * 
+ *
  * Public headers MUST NOT include third-party GUI headers like imgui.h.
  */
-class IWidget {
-public:
+class IWidget
+{
+  public:
     virtual ~IWidget() = default;
 
     /// Renders the widget content during the active frame loop.

@@ -7,10 +7,12 @@
 
 struct GLFWwindow;
 
-namespace spy::ui {
+namespace spy::ui
+{
 
-class ImGuiUIRenderer : public IUIRenderer {
-public:
+class ImGuiUIRenderer : public IUIRenderer
+{
+  public:
     ImGuiUIRenderer();
     ~ImGuiUIRenderer() override;
 
@@ -22,7 +24,7 @@ public:
     void EndFrame() override;
     void Shutdown() override;
 
-private:
+  private:
     void setup_theme();
 
     GLFWwindow* _window{nullptr};

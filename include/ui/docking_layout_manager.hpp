@@ -3,13 +3,15 @@
 #include "ui/i_widget.hpp"
 #include <memory>
 
-namespace spy::ui {
+namespace spy::ui
+{
 
 /**
  * @brief Docking Layout Manager widget handling main dockspace and window docking.
  */
-class DockingLayoutManager : public IWidget {
-public:
+class DockingLayoutManager : public IWidget
+{
+  public:
     DockingLayoutManager();
     ~DockingLayoutManager() override;
 
@@ -23,7 +25,7 @@ public:
     [[nodiscard]] bool is_Visible() const noexcept override;
     void set_Visible(bool visible) noexcept override;
 
-private:
+  private:
     struct Impl;
     std::unique_ptr<Impl> _impl;
 };

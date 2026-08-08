@@ -5,16 +5,18 @@
 
 #include <memory>
 
-namespace spy::ui {
+namespace spy::ui
+{
 
 /**
  * @brief Pure abstract base class for the UI Renderer.
- * 
+ *
  * Manages the application window, graphics context, ImGui frame loop,
  * and widget execution without exposing third-party graphics headers in public APIs.
  */
-class IUIRenderer {
-public:
+class IUIRenderer
+{
+  public:
     virtual ~IUIRenderer() = default;
 
     /// Initializes the windowing backend, graphics context, and ImGui subsystems.
