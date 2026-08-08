@@ -68,20 +68,20 @@ bool ImGuiUIRenderer::Initialize(const UIRendererConfig& config) {
     return true;
 }
 
-void ImGuiUIRenderer::Register_Widget(std::shared_ptr<IWidget> widget) {
+void ImGuiUIRenderer::RegisterWidget(std::shared_ptr<IWidget> widget) {
     if (widget) {
         _widgets.push_back(std::move(widget));
     }
 }
 
-bool ImGuiUIRenderer::Should_Close() const noexcept {
+bool ImGuiUIRenderer::ShouldClose() const noexcept {
     if (!_window) {
         return true;
     }
     return glfwWindowShouldClose(_window) != 0;
 }
 
-void ImGuiUIRenderer::Begin_Frame() {
+void ImGuiUIRenderer::BeginFrame() {
     if (!_initialized) return;
 
     glfwPollEvents();
@@ -91,7 +91,7 @@ void ImGuiUIRenderer::Begin_Frame() {
     ImGui::NewFrame();
 }
 
-void ImGuiUIRenderer::Render_Widgets() {
+void ImGuiUIRenderer::RenderWidgets() {
     if (!_initialized) return;
 
     for (auto& widget : _widgets) {
@@ -101,7 +101,7 @@ void ImGuiUIRenderer::Render_Widgets() {
     }
 }
 
-void ImGuiUIRenderer::End_Frame() {
+void ImGuiUIRenderer::EndFrame() {
     if (!_initialized) return;
 
     ImGui::Render();
@@ -192,8 +192,9 @@ void ImGuiUIRenderer::setup_theme() {
     style.PopupBorderSize   = 1.0f;
 }
 
-std::unique_ptr<IUIRenderer> create_ui_renderer() {
+std::unique_ptr<IUIRenderer> CreateUIRenderer() {
     return std::make_unique<ImGuiUIRenderer>();
 }
+
 
 } // namespace spy::ui

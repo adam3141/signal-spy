@@ -223,7 +223,7 @@ enum class WindowFunction : uint8_t {
     FlatTop
 };
 
-enum class Colormap : uint8_t {
+enum class ColourMap : uint8_t {
     Viridis,
     Inferno,
     Turbo,
@@ -239,7 +239,7 @@ struct SpectrumFrameDTO {
 };
 
 struct WaterfallParamsDTO {
-    Colormap color_scheme{Colormap::Viridis};
+    ColourMap colour_scheme{ColourMap::Viridis};
     float min_db{-120.0f};
     float max_db{0.0f};
     float contrast{1.0f};
@@ -270,19 +270,20 @@ public:
     virtual ~IUIRenderer() = default;
 
     virtual bool Initialize(const UIRendererConfig& config) = 0;
-    virtual void Register_Widget(std::shared_ptr<IWidget> widget) = 0;
-    [[nodiscard]] virtual bool Should_Close() const noexcept = 0;
-    virtual void Begin_Frame() = 0;
-    virtual void Render_Widgets() = 0;
-    virtual void End_Frame() = 0;
+    virtual void RegisterWidget(std::shared_ptr<IWidget> widget) = 0;
+    [[nodiscard]] virtual bool ShouldClose() const noexcept = 0;
+    virtual void BeginFrame() = 0;
+    virtual void RenderWidgets() = 0;
+    virtual void EndFrame() = 0;
     virtual void Shutdown() = 0;
 };
 
 /// Factory function creating the GLFW+ImGui concrete implementation.
-[[nodiscard]] std::unique_ptr<IUIRenderer> create_ui_renderer();
+[[nodiscard]] std::unique_ptr<IUIRenderer> CreateUIRenderer();
 
 } // namespace spy::ui
 ```
+
 
 
 ---

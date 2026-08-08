@@ -15,11 +15,11 @@ public:
     ~ImGuiUIRenderer() override;
 
     bool Initialize(const UIRendererConfig& config) override;
-    void Register_Widget(std::shared_ptr<IWidget> widget) override;
-    [[nodiscard]] bool Should_Close() const noexcept override;
-    void Begin_Frame() override;
-    void Render_Widgets() override;
-    void End_Frame() override;
+    void RegisterWidget(std::shared_ptr<IWidget> widget) override;
+    [[nodiscard]] bool ShouldClose() const noexcept override;
+    void BeginFrame() override;
+    void RenderWidgets() override;
+    void EndFrame() override;
     void Shutdown() override;
 
 private:

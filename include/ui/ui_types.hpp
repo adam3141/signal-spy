@@ -14,7 +14,7 @@ enum class WindowFunction : uint8_t {
     FlatTop
 };
 
-enum class Colormap : uint8_t {
+enum class ColourMap : uint8_t {
     Viridis,
     Inferno,
     Turbo,
@@ -30,7 +30,7 @@ struct SpectrumFrameDTO {
 };
 
 struct WaterfallParamsDTO {
-    Colormap color_scheme{Colormap::Viridis};
+    ColourMap colour_scheme{ColourMap::Viridis};
     float min_db{-120.0f};
     float max_db{0.0f};
     float contrast{1.0f};

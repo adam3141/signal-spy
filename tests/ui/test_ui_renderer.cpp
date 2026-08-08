@@ -63,7 +63,7 @@ TEST(UIRendererTest, DockingLayoutManagerLifecycle) {
 }
 
 TEST(UIRendererTest, HeadlessRendererInitializationAndLoop) {
-    auto renderer = create_ui_renderer();
+    auto renderer = CreateUIRenderer();
     ASSERT_NE(renderer, nullptr);
 
     UIRendererConfig config;
@@ -76,16 +76,17 @@ TEST(UIRendererTest, HeadlessRendererInitializationAndLoop) {
     ASSERT_TRUE(init_ok);
 
     auto widget = std::make_shared<MockTestWidget>("Mock Widget");
-    renderer->Register_Widget(widget);
+    renderer->RegisterWidget(widget);
 
-    renderer->Begin_Frame();
-    renderer->Render_Widgets();
-    renderer->End_Frame();
+    renderer->BeginFrame();
+    renderer->RenderWidgets();
+    renderer->EndFrame();
 
     EXPECT_EQ(widget->get_Render_Count(), 1);
 
     renderer->Shutdown();
 }
+
 
 
 } // namespace spy::ui::testing
