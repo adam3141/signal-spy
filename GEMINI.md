@@ -10,7 +10,7 @@
 - **Worktree Isolation & PR Workflow:** ALWAYS perform modifications inside a dedicated Git worktree (`git worktree add` / New Worktree Mode). NEVER edit files in the active workspace directory directly. Upon completing and verifying changes, push the branch, open a Pull Request targeting the `dev` branch (`gh pr create --base development`), and explicitly request a user review.
 
 ## 2. Project Architecture & Standards
-- **Code Style:** Follow language-standard style guidelines strictly, these can be found in the .clang-format file
+- **Code Style:** Follow language-standard style guidelines strictly, these can be found in the .clang-format file. Please ensure you run the following command before completing a task: `git ls-files '*.c' '*.cpp' '*.h' '*.hpp' | xargs clang-format-22 -i`
 - **Type Safety & Strictness:** Maintain strict typing across all modules. Avoid untyped interfaces or bypass mechanisms.
 - **Use Interfaces:** Use interfaces to define contracts between modules. This allows for easy mocking and testing.
 - **Use Modern C++:** Use modern C++ features (C++23, C++26) where appropriate.
