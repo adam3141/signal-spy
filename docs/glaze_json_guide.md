@@ -171,19 +171,29 @@ The exact same C++ reflection definitions work across multiple serialization for
 SignalSettings config;
 std::string buffer;
 
-// Binary Efficient Versatile Encoding (BEVE) - Ultra fast binary format for signal buffers
-glz::write_beve(config, buffer);
-glz::read_beve(config, buffer);
+// 1. Binary Efficient Versatile Encoding (BEVE) - High performance binary format
+auto write_beve_err = glz::write_beve(config, buffer);
+SignalSettings beve_config;
+auto read_beve_err = glz::read_beve(beve_config, buffer);
 
-// TOML configuration format
-glz::write_toml(config, buffer);
+// 2. TOML configuration format (read & write)
+std::string toml_str;
+auto write_toml_err = glz::write_toml(config, toml_str);
+SignalSettings toml_config;
+auto read_toml_err = glz::read_toml(toml_config, toml_str);
 
-// YAML format
-glz::write_yaml(config, buffer);
+// 3. YAML format (read & write)
+std::string yaml_str;
+auto write_yaml_err = glz::write_yaml(config, yaml_str);
+SignalSettings yaml_config;
+auto read_yaml_err = glz::read_yaml(yaml_config, yaml_str);
 
-// CSV format (for lists/vectors of structs)
+// 4. CSV format for vectors/lists of structs (read & write)
 std::vector<SignalSettings> list = {config};
-glz::write_csv(list, buffer);
+std::string csv_str;
+auto write_csv_err = glz::write_csv(list, csv_str);
+std::vector<SignalSettings> csv_list;
+auto read_csv_err = glz::read_csv(csv_list, csv_str);
 ```
 
 ### 4.3 JSON Pointer & Value Queries (`glz::get`)
