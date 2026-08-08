@@ -20,4 +20,5 @@ This will prevent another operator from working on the same task. However, the t
 Tasks will be appended to the bottom of this file as they are added.
 
 ## Tasks
-- [-] Create coding style guide - @adam3141 
+- [-] Create coding style guide - @adam3141
+- [X] Adding reflection and contracts to the build - @adam3141 09/08/2026
