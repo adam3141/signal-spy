@@ -1,10 +1,9 @@
-#ifndef SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
-#define SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
+#pragma once
 
 #include "ui/i_ui_renderer.hpp"
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 struct GLFWwindow;
 
@@ -15,24 +14,21 @@ public:
     ImGuiUIRenderer();
     ~ImGuiUIRenderer() override;
 
-    bool initialize(const UIRendererConfig& config) override;
-    void register_widget(std::shared_ptr<IWidget> widget) override;
-    [[nodiscard]] bool should_close() const noexcept override;
-    void begin_frame() override;
-    void render_widgets() override;
-    void end_frame() override;
-    void shutdown() override;
+    bool Initialize(const UIRendererConfig& config) override;
+    void Register_Widget(std::shared_ptr<IWidget> widget) override;
+    [[nodiscard]] bool Should_Close() const noexcept override;
+    void Begin_Frame() override;
+    void Render_Widgets() override;
+    void End_Frame() override;
+    void Shutdown() override;
 
 private:
     void setup_theme();
 
-    GLFWwindow* window_{nullptr};
-    UIRendererConfig config_{};
-    std::vector<std::shared_ptr<IWidget>> widgets_{};
-    bool initialized_{false};
+    GLFWwindow* _window{nullptr};
+    UIRendererConfig _config{};
+    std::vector<std::shared_ptr<IWidget>> _widgets{};
+    bool _initialized{false};
 };
 
 } // namespace spy::ui
-
-#endif // SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
-

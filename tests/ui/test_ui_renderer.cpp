@@ -12,54 +12,54 @@ namespace spy::ui::testing {
 class MockTestWidget : public IWidget {
 public:
     explicit MockTestWidget(std::string name)
-        : title_(std::move(name)) {}
+        : _title(std::move(name)) {}
 
-    void render() override {
-        render_count_++;
+    void Render() override {
+        _render_count++;
     }
 
-    [[nodiscard]] std::string_view title() const noexcept override {
-        return title_;
+    [[nodiscard]] std::string_view get_Title() const noexcept override {
+        return _title;
     }
 
-    [[nodiscard]] bool is_visible() const noexcept override {
-        return visible_;
+    [[nodiscard]] bool is_Visible() const noexcept override {
+        return _visible;
     }
 
-    void set_visible(bool visible) noexcept override {
-        visible_ = visible;
+    void set_Visible(bool visible) noexcept override {
+        _visible = visible;
     }
 
-    [[nodiscard]] size_t render_count() const noexcept {
-        return render_count_;
+    [[nodiscard]] size_t get_Render_Count() const noexcept {
+        return _render_count;
     }
 
 private:
-    std::string title_;
-    bool visible_{true};
-    size_t render_count_{0};
+    std::string _title;
+    bool _visible{true};
+    size_t _render_count{0};
 };
 
 TEST(UIRendererTest, MockWidgetLifecycle) {
     auto widget = std::make_shared<MockTestWidget>("Test Panel");
-    EXPECT_EQ(widget->title(), "Test Panel");
-    EXPECT_TRUE(widget->is_visible());
-    EXPECT_EQ(widget->render_count(), 0);
+    EXPECT_EQ(widget->get_Title(), "Test Panel");
+    EXPECT_TRUE(widget->is_Visible());
+    EXPECT_EQ(widget->get_Render_Count(), 0);
 
-    widget->render();
-    EXPECT_EQ(widget->render_count(), 1);
+    widget->Render();
+    EXPECT_EQ(widget->get_Render_Count(), 1);
 
-    widget->set_visible(false);
-    EXPECT_FALSE(widget->is_visible());
+    widget->set_Visible(false);
+    EXPECT_FALSE(widget->is_Visible());
 }
 
 TEST(UIRendererTest, DockingLayoutManagerLifecycle) {
     DockingLayoutManager manager;
-    EXPECT_EQ(manager.title(), "Dockspace Manager");
-    EXPECT_TRUE(manager.is_visible());
+    EXPECT_EQ(manager.get_Title(), "Dockspace Manager");
+    EXPECT_TRUE(manager.is_Visible());
 
-    manager.set_visible(false);
-    EXPECT_FALSE(manager.is_visible());
+    manager.set_Visible(false);
+    EXPECT_FALSE(manager.is_Visible());
 }
 
 TEST(UIRendererTest, HeadlessRendererInitializationAndLoop) {
@@ -72,19 +72,20 @@ TEST(UIRendererTest, HeadlessRendererInitializationAndLoop) {
     config.window_title = "Signal Spy Test Window";
     config.headless = true;
 
-    bool init_ok = renderer->initialize(config);
+    bool init_ok = renderer->Initialize(config);
     ASSERT_TRUE(init_ok);
 
     auto widget = std::make_shared<MockTestWidget>("Mock Widget");
-    renderer->register_widget(widget);
+    renderer->Register_Widget(widget);
 
-    renderer->begin_frame();
-    renderer->render_widgets();
-    renderer->end_frame();
+    renderer->Begin_Frame();
+    renderer->Render_Widgets();
+    renderer->End_Frame();
 
-    EXPECT_EQ(widget->render_count(), 1);
+    EXPECT_EQ(widget->get_Render_Count(), 1);
 
-    renderer->shutdown();
+    renderer->Shutdown();
 }
+
 
 } // namespace spy::ui::testing

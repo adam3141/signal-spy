@@ -1,5 +1,4 @@
-#ifndef SPY_UI_I_WIDGET_HPP
-#define SPY_UI_I_WIDGET_HPP
+#pragma once
 
 #include <string_view>
 
@@ -15,19 +14,16 @@ public:
     virtual ~IWidget() = default;
 
     /// Renders the widget content during the active frame loop.
-    virtual void render() = 0;
+    virtual void Render() = 0;
 
     /// Returns the human-readable display title of the widget panel.
-    [[nodiscard]] virtual std::string_view title() const noexcept = 0;
+    [[nodiscard]] virtual std::string_view get_Title() const noexcept = 0;
 
     /// Returns whether the widget window is currently open/visible.
-    [[nodiscard]] virtual bool is_visible() const noexcept = 0;
+    [[nodiscard]] virtual bool is_Visible() const noexcept = 0;
 
     /// Sets the visibility state of the widget window.
-    virtual void set_visible(bool visible) noexcept = 0;
+    virtual void set_Visible(bool visible) noexcept = 0;
 };
 
 } // namespace spy::ui
-
-#endif // SPY_UI_I_WIDGET_HPP
-

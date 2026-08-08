@@ -1,5 +1,4 @@
-#ifndef SPY_UI_TYPES_HPP
-#define SPY_UI_TYPES_HPP
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -47,6 +46,3 @@ struct UIRendererConfig {
 };
 
 } // namespace spy::ui
-
-#endif // SPY_UI_TYPES_HPP
-

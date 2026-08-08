@@ -13,15 +13,15 @@ namespace spy::ui {
 ImGuiUIRenderer::ImGuiUIRenderer() = default;
 
 ImGuiUIRenderer::~ImGuiUIRenderer() {
-    shutdown();
+    Shutdown();
 }
 
-bool ImGuiUIRenderer::initialize(const UIRendererConfig& config) {
-    if (initialized_) {
+bool ImGuiUIRenderer::Initialize(const UIRendererConfig& config) {
+    if (_initialized) {
         return true;
     }
 
-    config_ = config;
+    _config = config;
 
     glfwSetErrorCallback([](int error, const char* description) {
         std::cerr << "[GLFW Error " << error << "]: " << description << std::endl;
@@ -37,19 +37,19 @@ bool ImGuiUIRenderer::initialize(const UIRendererConfig& config) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    if (config_.headless) {
+    if (_config.headless) {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     }
 
-    window_ = glfwCreateWindow(config_.window_width, config_.window_height, config_.window_title.c_str(), nullptr, nullptr);
-    if (!window_) {
+    _window = glfwCreateWindow(_config.window_width, _config.window_height, _config.window_title.c_str(), nullptr, nullptr);
+    if (!_window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return false;
     }
 
-    glfwMakeContextCurrent(window_);
-    glfwSwapInterval(config_.vsync ? 1 : 0);
+    glfwMakeContextCurrent(_window);
+    glfwSwapInterval(_config.vsync ? 1 : 0);
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -61,28 +61,28 @@ bool ImGuiUIRenderer::initialize(const UIRendererConfig& config) {
     setup_theme();
 
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window_, true);
+    ImGui_ImplGlfw_InitForOpenGL(_window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    initialized_ = true;
+    _initialized = true;
     return true;
 }
 
-void ImGuiUIRenderer::register_widget(std::shared_ptr<IWidget> widget) {
+void ImGuiUIRenderer::Register_Widget(std::shared_ptr<IWidget> widget) {
     if (widget) {
-        widgets_.push_back(std::move(widget));
+        _widgets.push_back(std::move(widget));
     }
 }
 
-bool ImGuiUIRenderer::should_close() const noexcept {
-    if (!window_) {
+bool ImGuiUIRenderer::Should_Close() const noexcept {
+    if (!_window) {
         return true;
     }
-    return glfwWindowShouldClose(window_) != 0;
+    return glfwWindowShouldClose(_window) != 0;
 }
 
-void ImGuiUIRenderer::begin_frame() {
-    if (!initialized_) return;
+void ImGuiUIRenderer::Begin_Frame() {
+    if (!_initialized) return;
 
     glfwPollEvents();
 
@@ -91,47 +91,48 @@ void ImGuiUIRenderer::begin_frame() {
     ImGui::NewFrame();
 }
 
-void ImGuiUIRenderer::render_widgets() {
-    if (!initialized_) return;
+void ImGuiUIRenderer::Render_Widgets() {
+    if (!_initialized) return;
 
-    for (auto& widget : widgets_) {
-        if (widget && widget->is_visible()) {
-            widget->render();
+    for (auto& widget : _widgets) {
+        if (widget && widget->is_Visible()) {
+            widget->Render();
         }
     }
 }
 
-void ImGuiUIRenderer::end_frame() {
-    if (!initialized_) return;
+void ImGuiUIRenderer::End_Frame() {
+    if (!_initialized) return;
 
     ImGui::Render();
     int display_w = 0;
     int display_h = 0;
-    glfwGetFramebufferSize(window_, &display_w, &display_h);
+    glfwGetFramebufferSize(_window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
     glClearColor(0.10f, 0.11f, 0.13f, 1.00f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    glfwSwapBuffers(window_);
+    glfwSwapBuffers(_window);
 }
 
-void ImGuiUIRenderer::shutdown() {
-    if (!initialized_) return;
+void ImGuiUIRenderer::Shutdown() {
+    if (!_initialized) return;
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
-    if (window_) {
-        glfwDestroyWindow(window_);
-        window_ = nullptr;
+    if (_window) {
+        glfwDestroyWindow(_window);
+        _window = nullptr;
     }
 
     glfwTerminate();
-    initialized_ = false;
+    _initialized = false;
 }
+
 
 void ImGuiUIRenderer::setup_theme() {
     ImGuiStyle& style = ImGui::GetStyle();

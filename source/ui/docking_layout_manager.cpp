@@ -6,20 +6,20 @@
 namespace spy::ui {
 
 struct DockingLayoutManager::Impl {
-    std::string title{"Dockspace Manager"};
-    bool visible{true};
+    std::string _title{"Dockspace Manager"};
+    bool _visible{true};
 };
 
 DockingLayoutManager::DockingLayoutManager()
-    : impl_(std::make_unique<Impl>()) {}
+    : _impl(std::make_unique<Impl>()) {}
 
 DockingLayoutManager::~DockingLayoutManager() = default;
 
 DockingLayoutManager::DockingLayoutManager(DockingLayoutManager&&) noexcept = default;
 DockingLayoutManager& DockingLayoutManager::operator=(DockingLayoutManager&&) noexcept = default;
 
-void DockingLayoutManager::render() {
-    if (!impl_->visible) {
+void DockingLayoutManager::Render() {
+    if (!_impl->_visible) {
         return;
     }
 
@@ -49,16 +49,17 @@ void DockingLayoutManager::render() {
     ImGui::End();
 }
 
-std::string_view DockingLayoutManager::title() const noexcept {
-    return impl_->title;
+std::string_view DockingLayoutManager::get_Title() const noexcept {
+    return _impl->_title;
 }
 
-bool DockingLayoutManager::is_visible() const noexcept {
-    return impl_->visible;
+bool DockingLayoutManager::is_Visible() const noexcept {
+    return _impl->_visible;
 }
 
-void DockingLayoutManager::set_visible(bool visible) noexcept {
-    impl_->visible = visible;
+void DockingLayoutManager::set_Visible(bool visible) noexcept {
+    _impl->_visible = visible;
 }
+
 
 } // namespace spy::ui
