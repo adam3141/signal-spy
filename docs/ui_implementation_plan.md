@@ -2,15 +2,20 @@
 
 ## 1. Executive Summary & Objectives
 
-This document establishes the architecture, design principles, component taxonomy, and phased implementation roadmap for the Signal Spy user interface (UI). 
+This document establishes the architecture, design principles, component taxonomy, and phased implementation roadmap for the Signal Spy user interface (UI) and main application entry point (`main.cpp`).
 
 The primary objective of the UI engine is to provide **real-time, zero-latency visualization** (waterfall heatmaps, power spectrum density plots, time-domain oscilloscope views) and full control over Digital Signal Processing (DSP) pipelines while maintaining a modern, highly responsive user experience.
 
 ### Core Architectural Pillars
-1. **Strict ImGui Abstraction (Header Decoupling)**: Public application headers (`include/ui/...`) must remain 100% free of Dear ImGui (`imgui.h`), ImPlot (`implot.h`), and GLFW (`glfw3.h`) dependencies. All GUI third-party details are encapsulated using Pure Abstract Base Classes, Pimpl (Pointer to Implementation), and Value Data Transfer Objects (DTOs).
-2. **Lock-Free Multithreaded Architecture**: The UI render loop runs on the OS main thread while DSP data ingestion and FFT execution run asynchronously on dedicated worker threads. Data transfer between DSP and UI uses lock-free Single-Producer Single-Consumer (SPSC) ring buffers.
-3. **High-Performance GPU-Accelerated Rendering**: Double/triple-buffered OpenGL/Vulkan texture streaming for 2D waterfall displays and hardware-accelerated vector plotting for oscilloscope sweeps.
-4. **Dockable & Customizable Layouts**: Full support for docking spaces, pop-out viewports, custom dark-mode aesthetics, and persistent JSON layout presets.
+1. **Strict ImGui & ImPlot Abstraction (Header Decoupling)**: Public application headers (`include/ui/...`) must remain 100% free of Dear ImGui (`imgui.h`), ImPlot (`implot.h`), and GLFW (`glfw3.h`) dependencies. All GUI third-party details are encapsulated using Pure Abstract Base Classes, Pimpl (Pointer to Implementation), and Value Data Transfer Objects (DTOs).
+2. **Lock-Free Multithreaded Architecture**: The UI render loop runs on the OS main thread while DSP data ingestion and FFT execution run asynchronously on dedicated worker threads. Data transfer between DSP and UI uses a lightweight header-only Single-Producer Single-Consumer (`SPSCRingBuffer`) in `include/signal/spsc_ring_buffer.hpp`.
+3. **High-Performance GPU-Accelerated Rendering**: Double/triple-buffered OpenGL texture streaming for 2D waterfall displays and hardware-accelerated vector plotting for oscilloscope sweeps.
+4. **Dockable & Customizable Layouts**: Full support for docking spaces, pop-out viewports, custom dark-mode aesthetics, and persistent Glaze JSON layout presets.
+5. **Executable & Library Structure**: The project compiles a core static library (`signal-spy-lib`) containing all DSP and UI components, linked to the main executable target (`signal-spy`) defined in `source/CMakeLists.txt`.
+6. **Code Formatting & Verification Standard**: All C++ source files undergo automated formatting prior to completed tasks and PR submissions via:
+   ```bash
+   git ls-files '*.c' '*.cpp' '*.h' '*.hpp' | xargs clang-format-22 -i
+   ```
 
 ---
 
@@ -26,9 +31,6 @@ A key requirement for Signal Spy is zero perceived latency and smooth 60-144 FPS
 | **OS Compatibility** | High | **High** (Standard GLFW/Cocoa/X11 model) | Low/Complex (GLFW/macOS event pump restrictions) |
 | **Threading Overhead** | Zero | **Minimal** (Lock-free atomic queues) | High (Context switching & GL context migrations) |
 | **Implementation Risk**| Low | **Low** (Industry-standard SDR/Audio architecture) | High (Thread safety bugs across OS windowing backends) |
-
-#### Analysis of Option C (Dedicated UI Thread off Main Thread)
-Running ImGui and OpenGL rendering on a secondary thread while keeping window event polling (`glfwPollEvents`) on the OS main thread was evaluated. While theoretically appealing, OS windowing frameworks (macOS Cocoa, Wayland, Windows Win32) strictly enforce that window event dispatching and graphics context creation occur on Thread 0 (the main OS thread). Transferring OpenGL contexts (`glfwMakeContextCurrent`) between threads introduces platform-dependent locks and severe driver latency.
 
 #### Selected Architecture: Option B (Decoupled DSP Workers + Main UI/Render Thread)
 - **Main OS / UI Thread (Thread 0)**:
@@ -95,7 +97,7 @@ Signal Spy requires a rich set of specialized widgets categorized into **Signal 
 #### 2. `SpectrumWidget` (Power Spectral Density / PSD Plot)
 - **Purpose**: Displays instantaneous power (dBm or relative dB) versus frequency (Hz/kHz/MHz).
 - **Key Features**:
-  - High-speed 2D line plot rendered via ImPlot abstraction.
+  - High-speed 2D line plot rendered via ImPlot abstraction (Pimpl pattern hiding `implot.h`).
   - Multi-trace support: Live trace, Max-Hold, Min-Hold, and Average spectrum overlays.
   - Automatic peak detection markers (frequency peak labeling).
   - Multi-cursor delta measurement system ($\Delta f$, bandwidth, SNR calculation).
@@ -154,7 +156,7 @@ Signal Spy requires a rich set of specialized widgets categorized into **Signal 
 
 To ensure clean architecture, long-term maintainability, and fast build times, **third-party headers (`imgui.h`, `implot.h`, `glfw3.h`) must never be included in public header files in `include/ui/`**.
 
-### 4.1 Class Abstraction Hierarchy
+### Class Abstraction Hierarchy
 
 ```
        +--------------------+
@@ -174,166 +176,51 @@ To ensure clean architecture, long-term maintainability, and fast build times, *
        +--------------------+                    +--------------------+
 ```
 
-### 4.2 Core Header Definitions
-
-#### 1. Public Base Widget Interface (`include/ui/i_widget.hpp`)
-```cpp
-#pragma once
-
-#include <string_view>
-
-namespace spy::ui {
-
-class IWidget {
-public:
-    virtual ~IWidget() = default;
-
-    /// Renders the widget content during the active frame loop.
-    virtual void Render() = 0;
-
-    /// Returns the human-readable display title of the widget panel.
-    [[nodiscard]] virtual std::string_view get_Title() const noexcept = 0;
-
-    /// Returns whether the widget window is currently open/visible.
-    [[nodiscard]] virtual bool is_Visible() const noexcept = 0;
-
-    /// Sets the visibility state of the widget window.
-    virtual void set_Visible(bool visible) noexcept = 0;
-};
-
-} // namespace spy::ui
-```
-
-#### 2. Data Transfer Objects (DTOs) (`include/ui/ui_types.hpp`)
-```cpp
-#pragma once
-
-#include <cstdint>
-#include <string>
-#include <vector>
-#include <span>
-
-namespace spy::ui {
-
-enum class WindowFunction : uint8_t {
-    Rectangular,
-    Hann,
-    Hamming,
-    BlackmanHarris,
-    FlatTop
-};
-
-enum class ColourMap : uint8_t {
-    Viridis,
-    Inferno,
-    Turbo,
-    Plasma,
-    Grayscale
-};
-
-struct SpectrumFrameDTO {
-    uint64_t timestamp_ns{0};
-    double center_frequency_hz{0.0};
-    double sample_rate_hz{0.0};
-    std::vector<float> magnitudes_db;
-};
-
-struct WaterfallParamsDTO {
-    ColourMap colour_scheme{ColourMap::Viridis};
-    float min_db{-120.0f};
-    float max_db{0.0f};
-    float contrast{1.0f};
-    uint32_t history_depth{512};
-};
-
-} // namespace spy::ui
-```
-
-#### 3. Main UI Renderer Interface (`include/ui/i_ui_renderer.hpp`)
-```cpp
-#pragma once
-
-#include "ui/i_widget.hpp"
-#include <memory>
-
-namespace spy::ui {
-
-struct UIRendererConfig {
-    int window_width{1600};
-    int window_height{900};
-    const char* window_title{"Signal Spy"};
-    bool vsync{true};
-};
-
-class IUIRenderer {
-public:
-    virtual ~IUIRenderer() = default;
-
-    virtual bool Initialize(const UIRendererConfig& config) = 0;
-    virtual void RegisterWidget(std::shared_ptr<IWidget> widget) = 0;
-    [[nodiscard]] virtual bool ShouldClose() const noexcept = 0;
-    virtual void BeginFrame() = 0;
-    virtual void RenderWidgets() = 0;
-    virtual void EndFrame() = 0;
-    virtual void Shutdown() = 0;
-};
-
-/// Factory function creating the GLFW+ImGui concrete implementation.
-[[nodiscard]] std::unique_ptr<IUIRenderer> CreateUIRenderer();
-
-} // namespace spy::ui
-```
-
-
-
 ---
 
 ## 5. Phased Implementation Roadmap & Milestones
 
-The implementation is broken down into 5 executable milestones. Each milestone contains verifiable deliverables and checkboxes.
+The main application and UI implementation is structured into 5 single-PR milestones. Each milestone will be developed in a dedicated Git worktree branch targeting `dev`.
 
-### Milestone 1: UI Core Abstraction & Renderer Framework
-- [x] Implement `IWidget` interface and `IUIRenderer` factory in `include/ui/`.
-- [x] Implement `ImGuiUIRenderer` concrete backend in `source/ui/imgui_ui_renderer.cpp` using GLFW + OpenGL3.
-- [x] Configure custom modern dark-mode theme palette and load crisp typography (e.g. Inter font).
-- [x] Implement `DockingLayoutManager` initializing main viewport dockspace.
-- [x] Write unit & integration tests for UI window initialization and renderer lifecycle.
+### Milestone 1: Main Application Entry Point & Shell Integration (PR 1)
+- [x] Core abstraction (`IWidget`, `IUIRenderer`, `DockingLayoutManager`) and dark mode theme.
+- [ ] Add `source/main.cpp` entry point initializing `IUIRenderer`, `DockingLayoutManager`, and event loop.
+- [ ] Implement `MainMenuBarWidget` (top navigation menu) and `StatusBarWidget` (live FPS, render latency, telemetry).
+- [ ] Update `source/CMakeLists.txt` to build `signal-spy` executable linking with `signal-spy-lib`.
+- [ ] Add automated tests for menu/status bar widget lifecycles.
 
-
-### Milestone 2: Signal Visualization Widgets
+### Milestone 2: Signal Visualization Widgets (PR 2)
 - [ ] Implement `SpectrumWidget` with ImPlot line plotting, dB scaling, and multi-trace overlays (Live, Max-Hold, Min-Hold).
 - [ ] Implement peak detection marker overlays and interactive multi-cursors ($\Delta f$, bandwidth, SNR).
 - [ ] Implement `WaterfallWidget` using double-buffered OpenGL PBO texture streaming.
-- [ ] Add colormap shaders/lookup tables (Viridis, Inferno, Turbo, Grayscale) and dB dynamic range adjustments.
+- [ ] Add colormap lookup tables (Viridis, Inferno, Turbo, Plasma, Grayscale) and dB dynamic range adjustments.
 - [ ] Implement `TimeDomainWidget` oscilloscope amplitude sweeps and I/Q constellation 2D scatter plots.
 
-### Milestone 3: Control Panels & Command Bus Integration
-- [ ] Implement thread-safe, lock-free SPSC queue for spectrum frame transfer from DSP to UI.
-- [ ] Implement thread-safe MPSC command queue for UI -> DSP configuration requests.
-- [ ] Implement `SignalSourceControlWidget` (source selection, frequency tuning, SDR gains, WAV/SigMF file playback).
-- [ ] Implement `DSPConfigWidget` (FFT size selection, windowing function selector, averaging factor).
-- [ ] Implement `DataExportWidget` (SigMF recording toggle, image snapshot, JSON spectrum frame export).
+### Milestone 3: Control Panels & Command Bus Integration (PR 3)
+- [ ] Implement `SignalSourceControlWidget` (SDR device selection, frequency tuning, RF gain, WAV/SigMF file playback).
+- [ ] Implement `DSPConfigWidget` (FFT size selector 512..65536, windowing functions, averaging mode).
+- [ ] Implement `DataExportWidget` (SigMF recording toggle, viewport PNG snapshot, JSON spectrum export).
 
-### Milestone 4: Docking Layouts, Presets & Persistence
-- [ ] Implement layout preset manager (Default, Spectrum Focused, Oscilloscope Focused, Minimal).
+### Milestone 4: Inter-Thread SPSC Spectrum Pipeline & Mock Ingestion (PR 4)
+- [ ] Implement lightweight header-only lock-free queue (`SPSCRingBuffer`) in `include/signal/spsc_ring_buffer.hpp`.
+- [ ] Implement non-blocking MPSC command queue for UI-to-DSP control instructions.
+- [ ] Integrate mock synthetic spectrum generator thread pushing live frames to UI visualization widgets.
+
+### Milestone 5: Layout Presets, Glaze JSON Persistence & Final Polish (PR 5)
+- [ ] Implement layout preset manager (`LayoutPresetManager`) with Default, Spectrum Focused, Oscilloscope Focused, and Minimal presets.
 - [ ] Integrate Glaze JSON serialization for saving/loading layout presets and UI settings to disk.
-- [ ] Add `MainMenuBarWidget` and `StatusBarWidget` displaying live FPS, render latency, queue drops, and sample rates.
-
-### Milestone 5: Benchmarking, Profiling & Performance Verification
-- [ ] Instrument UI frame loops, texture uploads, and widget draw calls with Tracy markers (`FrameMark`, `ZoneScoped`).
-- [ ] Benchmark high throughput waterfall streaming (60 FPS rendering at 65,536 FFT points).
-- [ ] Verify zero memory allocations during steady-state widget rendering.
-- [ ] Ensure end-to-end processing-to-display latency stays strictly below 50ms.
+- [ ] Benchmark high-throughput waterfall streaming (60 FPS rendering at 65,536 FFT points) with Tracy profiling markers.
+- [ ] Verify clean code formatting (`clang-format-22`), zero compiler warnings, and 100% passing unit tests.
 
 ---
 
 ## 6. Verification & Quality Assurance Plan
 
 ### Automated Verification
-- **Build Verification**: Compile clean with zero warnings on GCC/Clang (`-Wall -Wextra -Werror`).
-- **Unit Testing**: Run `ctest` targeting `signal-spy-tests` to verify widget state registration and lock-free queue concurrency.
-- **Header Hygiene Check**: Verify that `grep -r "imgui.h" include/` returns zero matches.
+- **Code Formatting**: Ensure all source files pass `git ls-files '*.c' '*.cpp' '*.h' '*.hpp' | xargs clang-format-22 -i`.
+- **Build Verification**: Clean compilation (`cmake --build build`).
+- **Unit Testing**: Execution of test suite (`ctest --test-dir build --output-on-failure`).
+- **Header Hygiene**: `grep -r "imgui.h" include/` and `grep -r "implot.h" include/` return zero matches.
 
-### Performance & Latency Benchmarks
-- Render loop frame budget: $< 16.6\text{ ms}$ (60 FPS) and $< 8.3\text{ ms}$ (120 FPS).
-- DSP-to-UI transfer latency: $< 5\text{ ms}$ using lock-free SPSC buffer.
+### Manual Verification
+- Execute `signal-spy` binary, verify window layout docking, widget interactions, menu navigation, status bar counters, and smooth rendering.
