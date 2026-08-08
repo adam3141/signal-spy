@@ -5,6 +5,11 @@ set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+
+# Add reflection and contracts to the build
+add_definitions(-freflection)
+add_definitions(-fcontracts)
+
 # The Release with Debug Info preset will also enable profiling with Tracy
 if(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
     add_definitions(-DTRACY_ENABLE)
@@ -21,6 +26,8 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
     SYMBOLIC
   )
 endif()
+
+
 
 add_subdirectory(submodules)
 add_subdirectory(source)
