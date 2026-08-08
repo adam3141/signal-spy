@@ -1,0 +1,7 @@
+CompileFlags:
+  Remove:
+    - -freflection
+    - -fcontracts
+    - -fmodules-ts
+    - -fmodule-mapper=*
+    - -fdeps-format=*
