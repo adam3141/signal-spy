@@ -23,3 +23,5 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
 endif()
 
 add_subdirectory(submodules)
+add_subdirectory(source)
+add_subdirectory(tests)
