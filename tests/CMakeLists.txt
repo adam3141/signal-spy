@@ -1,6 +1,7 @@
 enable_testing()
 
 add_subdirectory(signal)
+add_subdirectory(ui)
 
 add_executable(signal-spy-tests)
 
