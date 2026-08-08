@@ -95,6 +95,54 @@ struct glz::meta<DSPParams> {
 };
 ```
 
+#### 3.1.1 Deserializing Deeply Nested JSON Data into `DSPParams`
+
+When your `DSPParams` struct is buried deep inside a complex JSON document (for example, at `/application/system/dsp`), Glaze provides two clean approaches:
+
+##### Approach 1: Direct JSON Pointer Extraction (`glz::read_as_json`)
+You do **not** need to declare outer C++ wrapper structs for parent JSON objects. Pass a JSON pointer path directly to `glz::read_as_json`:
+
+```cpp
+std::string deeply_nested_json = R"({
+    "application": {
+        "version": "1.0",
+        "system": {
+            "dsp": {
+                "frequency_hz": 144200000.0,
+                "receiver_gain": 18.5,
+                "agc_enabled": true
+            }
+        }
+    }
+})";
+
+DSPParams dsp_config;
+
+// Parse ONLY the "/application/system/dsp" object directly into dsp_config
+auto parse_err = glz::read_as_json(dsp_config, "/application/system/dsp", deeply_nested_json);
+
+if (!parse_err) {
+    std::cout << "Extracted Frequency: " << dsp_config.freq_hz << " Hz\n";
+    std::cout << "Extracted Gain: " << dsp_config.gain_db << " dB\n";
+}
+```
+
+##### Approach 2: Struct Composition (Full Schema Mapping)
+If you prefer reflecting the complete outer schema, nest `DSPParams` as a member of outer structs:
+
+```cpp
+struct AppConfig {
+    struct SystemConfig {
+        DSPParams dsp; // Deeply nested DSPParams member
+    } system;
+};
+
+AppConfig full_config;
+// Automatically parses the full document including the nested dsp member
+glz::read_json(full_config, deeply_nested_json);
+// Access via: full_config.system.dsp.freq_hz
+```
+
 ### 3.2 Method B: Internal `struct glz` (Nested Inside Struct)
 
 If you own the struct definition and prefer keeping reflection metadata adjacent to the member declarations, define a nested `struct glz`:
