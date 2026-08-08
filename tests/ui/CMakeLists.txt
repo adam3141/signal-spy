@@ -1,0 +1,9 @@
+set(UI_TEST_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_ui_renderer.cpp
+)
+
+set(TEST_SOURCES
+    ${TEST_SOURCES}
+    ${UI_TEST_SOURCES}
+    PARENT_SCOPE
+)
