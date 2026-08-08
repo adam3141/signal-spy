@@ -2,11 +2,13 @@ set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
 
+# Enable AVX & SSE2 SIMD optimizations for FFTW3
+set(ENABLE_SSE2 ON CACHE BOOL "Enable SSE2 optimizations" FORCE)
+set(ENABLE_AVX ON CACHE BOOL "Enable AVX optimizations" FORCE)
+
 FetchContent_Declare(
   fftw3
-  GIT_REPOSITORY https://github.com/FFTW/fftw3.git
-  GIT_TAG        fftw-3.3.10
-  GIT_SHALLOW    TRUE
+  URL https://fftw.org/fftw-3.3.11.tar.gz
 )
 
 FetchContent_MakeAvailable(fftw3)
