@@ -1,9 +1,9 @@
-#ifndef SIGNAL_SPY_UI_I_WIDGET_HPP
-#define SIGNAL_SPY_UI_I_WIDGET_HPP
+#ifndef SPY_UI_I_WIDGET_HPP
+#define SPY_UI_I_WIDGET_HPP
 
 #include <string_view>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 /**
  * @brief Abstract interface for all UI widgets and dockable panels.
@@ -27,6 +27,7 @@ public:
     virtual void set_visible(bool visible) noexcept = 0;
 };
 
-} // namespace signal_spy::ui
+} // namespace spy::ui
 
-#endif // SIGNAL_SPY_UI_I_WIDGET_HPP
+#endif // SPY_UI_I_WIDGET_HPP
+

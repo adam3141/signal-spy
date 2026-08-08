@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 ImGuiUIRenderer::ImGuiUIRenderer() = default;
 
@@ -195,4 +195,4 @@ std::unique_ptr<IUIRenderer> create_ui_renderer() {
     return std::make_unique<ImGuiUIRenderer>();
 }
 
-} // namespace signal_spy::ui
+} // namespace spy::ui

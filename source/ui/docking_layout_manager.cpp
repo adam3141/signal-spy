@@ -3,7 +3,7 @@
 #include <imgui.h>
 #include <string>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 struct DockingLayoutManager::Impl {
     std::string title{"Dockspace Manager"};
@@ -61,4 +61,4 @@ void DockingLayoutManager::set_visible(bool visible) noexcept {
     impl_->visible = visible;
 }
 
-} // namespace signal_spy::ui
+} // namespace spy::ui

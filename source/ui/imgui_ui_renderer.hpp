@@ -1,5 +1,5 @@
-#ifndef SIGNAL_SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
-#define SIGNAL_SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
+#ifndef SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
+#define SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
 
 #include "ui/i_ui_renderer.hpp"
 
@@ -8,7 +8,7 @@
 
 struct GLFWwindow;
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 class ImGuiUIRenderer : public IUIRenderer {
 public:
@@ -32,6 +32,7 @@ private:
     bool initialized_{false};
 };
 
-} // namespace signal_spy::ui
+} // namespace spy::ui
 
-#endif // SIGNAL_SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
+#endif // SPY_SOURCE_UI_IMGUI_UI_RENDERER_HPP
+

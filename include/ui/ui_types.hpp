@@ -1,11 +1,11 @@
-#ifndef SIGNAL_SPY_UI_TYPES_HPP
-#define SIGNAL_SPY_UI_TYPES_HPP
+#ifndef SPY_UI_TYPES_HPP
+#define SPY_UI_TYPES_HPP
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 enum class WindowFunction : uint8_t {
     Rectangular,
@@ -46,6 +46,7 @@ struct UIRendererConfig {
     bool headless{false};
 };
 
-} // namespace signal_spy::ui
+} // namespace spy::ui
 
-#endif // SIGNAL_SPY_UI_TYPES_HPP
+#endif // SPY_UI_TYPES_HPP
+

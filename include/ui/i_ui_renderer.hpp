@@ -1,12 +1,12 @@
-#ifndef SIGNAL_SPY_UI_I_UI_RENDERER_HPP
-#define SIGNAL_SPY_UI_I_UI_RENDERER_HPP
+#ifndef SPY_UI_I_UI_RENDERER_HPP
+#define SPY_UI_I_UI_RENDERER_HPP
 
 #include "ui/i_widget.hpp"
 #include "ui/ui_types.hpp"
 
 #include <memory>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 /**
  * @brief Pure abstract base class for the UI Renderer.
@@ -43,6 +43,7 @@ public:
 /// Factory function creating an instance of the UI renderer.
 [[nodiscard]] std::unique_ptr<IUIRenderer> create_ui_renderer();
 
-} // namespace signal_spy::ui
+} // namespace spy::ui
 
-#endif // SIGNAL_SPY_UI_I_UI_RENDERER_HPP
+#endif // SPY_UI_I_UI_RENDERER_HPP
+

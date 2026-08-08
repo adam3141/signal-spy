@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-namespace signal_spy::ui::testing {
+namespace spy::ui::testing {
 
 class MockTestWidget : public IWidget {
 public:
@@ -87,4 +87,4 @@ TEST(UIRendererTest, HeadlessRendererInitializationAndLoop) {
     renderer->shutdown();
 }
 
-} // namespace signal_spy::ui::testing
+} // namespace spy::ui::testing

@@ -178,12 +178,12 @@ To ensure clean architecture, long-term maintainability, and fast build times, *
 
 #### 1. Public Base Widget Interface (`include/ui/i_widget.hpp`)
 ```cpp
-#ifndef SIGNAL_SPY_UI_I_WIDGET_HPP
-#define SIGNAL_SPY_UI_I_WIDGET_HPP
+#ifndef SPY_UI_I_WIDGET_HPP
+#define SPY_UI_I_WIDGET_HPP
 
 #include <string_view>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 class IWidget {
 public:
@@ -202,22 +202,22 @@ public:
     virtual void set_visible(bool visible) noexcept = 0;
 };
 
-} // namespace signal_spy::ui
+} // namespace spy::ui
 
-#endif // SIGNAL_SPY_UI_I_WIDGET_HPP
+#endif // SPY_UI_I_WIDGET_HPP
 ```
 
 #### 2. Data Transfer Objects (DTOs) (`include/ui/ui_types.hpp`)
 ```cpp
-#ifndef SIGNAL_SPY_UI_TYPES_HPP
-#define SIGNAL_SPY_UI_TYPES_HPP
+#ifndef SPY_UI_TYPES_HPP
+#define SPY_UI_TYPES_HPP
 
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <span>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 enum class WindowFunction : uint8_t {
     Rectangular,
@@ -250,20 +250,20 @@ struct WaterfallParamsDTO {
     uint32_t history_depth{512};
 };
 
-} // namespace signal_spy::ui
+} // namespace spy::ui
 
-#endif // SIGNAL_SPY_UI_TYPES_HPP
+#endif // SPY_UI_TYPES_HPP
 ```
 
 #### 3. Main UI Renderer Interface (`include/ui/i_ui_renderer.hpp`)
 ```cpp
-#ifndef SIGNAL_SPY_UI_I_UI_RENDERER_HPP
-#define SIGNAL_SPY_UI_I_UI_RENDERER_HPP
+#ifndef SPY_UI_I_UI_RENDERER_HPP
+#define SPY_UI_I_UI_RENDERER_HPP
 
 #include "ui/i_widget.hpp"
 #include <memory>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 struct UIRendererConfig {
     int window_width{1600};
@@ -288,9 +288,9 @@ public:
 /// Factory function creating the GLFW+ImGui concrete implementation.
 [[nodiscard]] std::unique_ptr<IUIRenderer> create_ui_renderer();
 
-} // namespace signal_spy::ui
+} // namespace spy::ui
 
-#endif // SIGNAL_SPY_UI_I_UI_RENDERER_HPP
+#endif // SPY_UI_I_UI_RENDERER_HPP
 ```
 
 ---
@@ -300,11 +300,12 @@ public:
 The implementation is broken down into 5 executable milestones. Each milestone contains verifiable deliverables and checkboxes.
 
 ### Milestone 1: UI Core Abstraction & Renderer Framework
-- [ ] Implement `IWidget` interface and `IUIRenderer` factory in `include/ui/`.
-- [ ] Implement `ImGuiUIRenderer` concrete backend in `source/ui/imgui_ui_renderer.cpp` using GLFW + OpenGL3.
-- [ ] Configure custom modern dark-mode theme palette and load crisp typography (e.g. Inter font).
-- [ ] Implement `DockingLayoutManager` initializing main viewport dockspace.
-- [ ] Write unit & integration tests for UI window initialization and renderer lifecycle.
+- [x] Implement `IWidget` interface and `IUIRenderer` factory in `include/ui/`.
+- [x] Implement `ImGuiUIRenderer` concrete backend in `source/ui/imgui_ui_renderer.cpp` using GLFW + OpenGL3.
+- [x] Configure custom modern dark-mode theme palette and load crisp typography (e.g. Inter font).
+- [x] Implement `DockingLayoutManager` initializing main viewport dockspace.
+- [x] Write unit & integration tests for UI window initialization and renderer lifecycle.
+
 
 ### Milestone 2: Signal Visualization Widgets
 - [ ] Implement `SpectrumWidget` with ImPlot line plotting, dB scaling, and multi-trace overlays (Live, Max-Hold, Min-Hold).

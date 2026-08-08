@@ -1,10 +1,10 @@
-#ifndef SIGNAL_SPY_UI_DOCKING_LAYOUT_MANAGER_HPP
-#define SIGNAL_SPY_UI_DOCKING_LAYOUT_MANAGER_HPP
+#ifndef SPY_UI_DOCKING_LAYOUT_MANAGER_HPP
+#define SPY_UI_DOCKING_LAYOUT_MANAGER_HPP
 
 #include "ui/i_widget.hpp"
 #include <memory>
 
-namespace signal_spy::ui {
+namespace spy::ui {
 
 /**
  * @brief Docking Layout Manager widget handling main dockspace and window docking.
@@ -29,6 +29,7 @@ private:
     std::unique_ptr<Impl> impl_;
 };
 
-} // namespace signal_spy::ui
+} // namespace spy::ui
 
-#endif // SIGNAL_SPY_UI_DOCKING_LAYOUT_MANAGER_HPP
+#endif // SPY_UI_DOCKING_LAYOUT_MANAGER_HPP
+
