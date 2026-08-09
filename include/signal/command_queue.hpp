@@ -59,7 +59,7 @@ class CommandQueue
      * @brief Enqueues a command (Thread-safe).
      * @param command Command variant to enqueue.
      */
-    void push(CommandVariant command)
+    void Push(CommandVariant command)
     {
         std::lock_guard<std::mutex> lock(_mutex);
         _queue.push_back(std::move(command));
@@ -70,7 +70,7 @@ class CommandQueue
      * @param command Output parameter where popped command will be stored.
      * @return True if a command was popped, false if queue was empty.
      */
-    bool pop(CommandVariant& command)
+    bool Pop(CommandVariant& command)
     {
         std::lock_guard<std::mutex> lock(_mutex);
         if (_queue.empty())
@@ -86,7 +86,7 @@ class CommandQueue
     /**
      * @brief Returns true if the queue is empty.
      */
-    [[nodiscard]] bool empty() const
+    [[nodiscard]] bool IsEmpty() const
     {
         std::lock_guard<std::mutex> lock(_mutex);
         return _queue.empty();
@@ -95,7 +95,7 @@ class CommandQueue
     /**
      * @brief Returns current number of pending commands.
      */
-    [[nodiscard]] std::size_t size() const
+    [[nodiscard]] std::size_t Size() const
     {
         std::lock_guard<std::mutex> lock(_mutex);
         return _queue.size();
