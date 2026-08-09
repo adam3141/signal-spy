@@ -6,12 +6,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-# Add reflection and contracts to the build
-add_definitions(-freflection)
-add_definitions(-fcontracts)
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-freflection" HAS_FREFLECTION)
+if(HAS_FREFLECTION)
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-freflection>)
+endif()
+
+check_cxx_compiler_flag("-fcontracts" HAS_FCONTRACTS)
+if(HAS_FCONTRACTS)
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fcontracts>)
+endif()
 
 # The Release with Debug Info preset will also enable profiling with Tracy
-if(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
+if("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     add_definitions(-DTRACY_ENABLE)
 endif()
 
