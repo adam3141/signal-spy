@@ -1,0 +1,9 @@
+set(APP_TEST_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_application.cpp
+)
+
+set(TEST_SOURCES
+    ${TEST_SOURCES}
+    ${APP_TEST_SOURCES}
+    PARENT_SCOPE
+)
